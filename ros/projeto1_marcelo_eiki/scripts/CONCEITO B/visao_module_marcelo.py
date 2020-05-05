@@ -55,9 +55,9 @@ def identifica_cor(frame):
     # frame = cv2.flip(frame, -1) # flip 0: eixo x, 1: eixo y, -1: 2 eixos
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    verde_1 = np.array([47, 100, 210])
-    verde_2 = np.array([70, 255, 255])
-    segmentado_cor = cv2.inRange(frame_hsv, verde_1, verde_2)
+    azul_1 = np.array([90, 100, 210])
+    azul_2 = np.array([130, 255, 255])
+    segmentado_cor = cv2.inRange(frame_hsv, azul_1, azul_2)
 
     
     # Note que a notacão do numpy encara as imagens como matriz, portanto o enderecamento é
@@ -129,9 +129,9 @@ def identifica_cor_amarelo(frame):
     branco_2 = np.array([40, 255, 255], dtype=np.uint8)
     segmentado_cor = cv2.inRange(frame_hsv, branco_1, branco_2)
 
-    verde_1 = np.array([47, 100, 230])
-    verde_2 = np.array([70, 255, 255])
-    duas_cores =segmentado_cor + cv2.inRange(frame_hsv, verde_1, verde_2)
+    azul_1 = np.array([90, 100, 230])
+    azul_2 = np.array([130, 255, 255])
+    duas_cores =segmentado_cor + cv2.inRange(frame_hsv, azul_1, azul_2)
 
 
     # Note que a notacão do numpy encara as imagens como matriz, portanto o enderecamento é

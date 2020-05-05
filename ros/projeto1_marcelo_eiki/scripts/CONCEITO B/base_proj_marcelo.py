@@ -223,34 +223,8 @@ if __name__=="__main__":
                 #vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
                 # len(media_verde) != 0 quando camera encontra verde
             if pegou_verde == False:
-                if len(media_verde) != 0 and len(centro) != 0:
-                    print ("PROCURANDO VERDEE")
-                    tolerancia = 15
-                    vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                    print("Média dos verdes: {0}, {1}".format(media_verde[0], media_verde[1]))
-                    print ("Scann")
-                    print ("MENOR TERMOOOOOOO: ",minimo)
-                    if minimo>0.4:
-                        x_objeto = media_verde[0]
-                        if (x_objeto < centro[0] - tolerancia):
-                            # Vira à esquerda
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/12.0))
-                            #print("ESQUERDA")
-                        elif (x_objeto > centro[0] + tolerancia):
-                            # Vira à direita
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/12.0))                    
-                            #print("DIREITA")
-                        elif (centro[0]- tolerancia < x_objeto < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
-                            # Segue em frente
-                            vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
-                            #print("FRENTE")
-                    # PEGOU_VERDE SE TORNARA TRUE (FEITO FORA DO IF (LINHA 305:306))
-                    if minimo<=0.4:
-                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,-0.00005))
-                        if minimo < 0.2: #Valor mínimo do scan (Saber se o robo bateu no verde)
-                            pegou_verde = True
-                # SE NÃO ENCONTROU O VERDE, CONTINUA NO TRAJETO
-                elif len(media_amarelo) != 0 and len(centro) != 0:
+
+                if len(media_amarelo) != 0 and len(centro) != 0 and media_verde[1] <1:
                     print ("NÃO PEGOU VERDEEE, NA TRILHA")
                     vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
                     tolerancia = 50
@@ -266,7 +240,39 @@ if __name__=="__main__":
                         # Segue em frente
                         vel = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
                         #print("FRENTE")
+
+                elif len(media_verde) != 0 and len(centro) != 0:
+                    print ("PROCURANDO VERDEE")
+                    tolerancia = 15
+                    vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                    print("Média dos verdes: {0}, {1}".format(media_verde[0], media_verde[1]))
+                    print ("Scann")
+                    print ("MENOR TERMOOOOOOO: ",minimo)
+                    if minimo>0.4:
+                        x_objeto = media_verde[0]
+                        if (x_objeto < centro[0] - tolerancia):
+                            # Vira à esquerda
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/15.0))
+                            #print("ESQUERDA")
+                        elif (x_objeto > centro[0] + tolerancia):
+                            # Vira à direita
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/15.0))                    
+                            #print("DIREITA")
+                        elif (centro[0]- tolerancia < x_objeto < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
+                            # Segue em frente
+                            vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
+                            #print("FRENTE")
+                    # PEGOU_VERDE SE TORNARA TRUE (FEITO FORA DO IF (LINHA 305:306))
+                    if minimo<=0.4:
+                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,-0.00005))
+                        if minimo < 0.2: #Valor mínimo do scan (Saber se o robo bateu no verde)
+                            pegou_verde = True
+                # SE NÃO ENCONTROU O VERDE, CONTINUA NO TRAJETO
+                
                 # CASO JA TENHA ESBARRADO NO VERDE, COMEÇA A PROCURAR AMARELO
+                else:
+                    vel = Twist(Vector3(0,0,0), Vector3(0,0,-1))
+
             else:
                 if len(media_amarelo) != 0 and len(centro) != 0:
                     print ("PEGOU VERDEEE")
@@ -290,6 +296,8 @@ if __name__=="__main__":
                     vel = Twist(Vector3(-0.7,0,0), Vector3(0,0,-1))
                     #TEMPO DO ROBO RODAR
                     rospy.sleep(0.5)
+                    vel = Twist(Vector3(0.5,0,0), Vector3(0,0,0))
+                    rospy.sleep(0,5)
 
             velocidade_saida.publish(vel)
             rospy.sleep(0.1)
