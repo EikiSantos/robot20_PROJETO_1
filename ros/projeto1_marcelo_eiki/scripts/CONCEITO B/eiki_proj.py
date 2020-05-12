@@ -35,13 +35,28 @@ from sensor_msgs.msg import LaserScan
 
 import visao_module_eiki 
 
-color = input("Cor:")
-station = input("Estacao: ")
-ID = input("ID: ")
+confirm = False
+while confirm != True:
+    color = input("Cor:")
+    station = input("Estacao: ")
+    ID = input("ID: ")
 
 
-instruction = [color, ID, station]
+    goal = [color, ID, station]
 
+    dic = {}
+    dic["Color"] = color
+    dic["Station"] = station
+    dic["ID"] = ID
+    print("--------------------------------------------------")
+    for k,v in dic.items():
+        print(k, " : ", v)
+    print("--------------------------------------------------")
+    resp = input("Confirmar (y/n): ")
+    if resp == "y":
+        confirm = True
+    else:
+        confirm = False
 
 
 
