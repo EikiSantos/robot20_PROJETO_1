@@ -237,50 +237,21 @@ if __name__=="__main__":
 
     try:
         # Inicializando - por default gira no sentido anti-horário
-        # vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/10.0))
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/10.0))
         
         while not rospy.is_shutdown():
-            vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+            #vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+            # o valor mínimo lido na lista do scan sera utilizado como método de aproximação
             if len(scan_frente) > 0:
                 minimo = min(scan_frente)
             else:
                 minimo = 5
-            if minimo < 0.2: #Valor mínimo do scan (Saber se o robo bateu no verde)
-                pegou_color = True
-            #if achou_verde == True:
-                #tolerancia = 25
-                #vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                # len(media_verde) != 0 quando camera encontra verde
+            # Iniciação da rota. O robo primeiro procurará a cor,
+            # se aproximará e assumiremos o controle da garra
             if pegou_color == False:
-                if len(media_color) != 0 and len(centro) != 0:
-                    print ("PROCURANDO: ", color)
-                    tolerancia = 15
-                    vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                    print("Média do ", color, ": {0}, {1}".format(media_color[0], media_color[1]))
-                    print ("Scann")
-                    print ("MENOR TERMOOOOOOO: ",minimo)
-                    if minimo>0.4:
-                        x_objeto = media_color[0]
-                        if (x_objeto < centro[0] - tolerancia):
-                            # Vira à esquerda
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/12.0))
-                            #print("ESQUERDA")
-                        elif (x_objeto > centro[0] + tolerancia):
-                            # Vira à direita
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/12.0))                    
-                            #print("DIREITA")
-                        elif (centro[0]- tolerancia < x_objeto < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
-                            # Segue em frente
-                            vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
-                            #print("FRENTE")
-                    # PEGOU_COLOR SE TORNARA TRUE (FEITO FORA DO IF (LINHA 305:306))
-                    if minimo<=0.4:
-                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,-0.00005))
-                        if minimo < 0.2: #Valor mínimo do scan (Saber se o robo bateu no verde)
-                            pegou_color = True
-                # SE NÃO ENCONTROU A COR, CONTINUA NO TRAJETO
-                elif len(media_amarelo) != 0 and len(centro) != 0:
-                    print ("NÃO PEGOU VERDEEE, NA TRILHA")
+                # Primeira condição se refere a não ter cor do creeper na tela mas ter cor amarela
+                if len(media_amarelo) != 0 and len(centro) != 0 and media_color[1] <1:
+                    print ("NÃO PEGOU A COR, NA TRILHA")
                     vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
                     tolerancia = 50
                     if (media_amarelo[0] < centro[0] - tolerancia):
@@ -295,30 +266,104 @@ if __name__=="__main__":
                         # Segue em frente
                         vel = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
                         #print("FRENTE")
-                # CASO JA TENHA ESBARRADO NO VERDE, COMEÇA A PROCURAR AMARELO
-            else:
-                if len(media_amarelo) != 0 and len(centro) != 0:
-                    print ("PEGOU VERDEEE")
+                # Tem o creeper que desejamos na tela, o robo irá em sua direção
+                elif len(media_color) != 0 and len(centro) != 0:
+                    print ("PROCURANDO A COR")
+                    tolerancia = 15
                     vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                    tolerancia = 50
-                    if (media_amarelo[0] < centro[0] - tolerancia):
-                        # Vira à esquerda
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/12))
-                        print("ESQUERDA")
-                    elif (media_amarelo[0] > centro[0] + tolerancia):
-                        # Vira à direita
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/12))                    
-                        print("DIREITA")
-                    elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
-                        # Segue em frente
-                        vel = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
-                        print("FRENTE")
-                else:
-                    # SE NÃO TIVER AMARELO NA TELA, RODA ATE ACHAR UM
-                    print("PROCURANDO AMARELOO")
-                    vel = Twist(Vector3(-0.7,0,0), Vector3(0,0,-1))
-                    #TEMPO DO ROBO RODAR
-                    rospy.sleep(0.5)
+                    print("Média da cor: {0}, {1}".format(media_color[0], media_color[1]))
+                    print ("Scann")
+                    print ("MENOR TERMOOOOOOO: ",minimo)
+                    # saber aproximação do robo
+                    if minimo>0.22:
+                        x_objeto = media_color[0]
+                        if (x_objeto < centro[0] - tolerancia):
+                            # Vira à esquerda
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/15.0))
+                            #print("ESQUERDA")
+                        elif (x_objeto > centro[0] + tolerancia):
+                            # Vira à direita
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/15.0))                    
+                            #print("DIREITA")
+                        elif (centro[0]- tolerancia < x_objeto < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
+                            # Segue em frente
+                            vel = Twist(Vector3(0.3,0,0), Vector3(0,0,0))
+                            #print("FRENTE")
+                    # quando estiver próximo, robo ficará parado e poderemos assumir a garra
+                    else:#Valor mínimo do scan (Saber se o robo bateu na cor)
+                        vel = Twist(Vector3(0,0,0),Vector3(0,0,0))
+                        velocidade_saida.publish(vel)
+                        rospy.sleep(0.1)
+                        raw_input()
+                        pego_color = True
+                        rospy.sleep(0.1)
+                        # Após pegar o robo, creeper dará meia volta e 
+                        # voltará a para a pista.
+                        # o código abaixo é necessário para o robo ficar próximo o suficiente da pista 
+                        # e decidir a direção que irá seguir
+                        vel = Twist(Vector3(-0.4,0,0),Vector3(0,0,-1.3))
+                        velocidade_saida.publish(vel)
+                        rospy.sleep(1.5)
+                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,0))
+                        velocidade_saida.publish(vel)
+                        rospy.sleep(1.5)
+                        
+
+            # Esse else se refere a ja ter pego o creeper,
+            # robo irá procurar a base agora e se não encontrar, continuará no projeto
+            else:
+                for r in resultados:
+                    # Encontrou a base, irá em sua direção
+                    if "bird" in r[0]:
+                        print ("ACHOU A BASEEE")
+                        x_objeto = (r[2][0] + r[3][0])/2
+                        tolerancia = 100
+                        # método de aproximação, se ficar mt próximo a camera não detecta a figura
+                        if minimo > 0.7:
+                            if x_objeto < (centro[0] - tolerancia):
+                                # Vira à esquerda
+                                vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/8.0))
+                                print("ESQUERDA")
+                            elif x_objeto > (centro[0] + tolerancia):
+                                # Vira à direita
+                                vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/8.0))                    
+                                print("DIREITA")
+                            elif (centro[0]- tolerancia) < x_objeto < (centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
+                                # Segue em frente
+                                vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
+                                print("FRENTE")
+                        else:
+                            # nesse momento, devemos abrir a garra, pode ser feito pelo código mesmo no futuro
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                            velocidade_saida.publish(vel)
+                            rospy.sleep(0.1)
+                            raw_input()
+                            
+
+                    elif len(media_amarelo) != 0 and len(centro) != 0:
+                        print ("PEGOU CREEPER. PROCURANDO A BASE")
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                        tolerancia = 100
+                        if (media_amarelo[0] < centro[0] - tolerancia):
+                            # Vira à esquerda
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/15))
+                            print("ESQUERDA")
+                        elif (media_amarelo[0] > centro[0] + tolerancia):
+                            # Vira à direita
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/15))                    
+                            print("DIREITA")
+                        elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
+                            # Segue em frente
+                            vel = Twist(Vector3(0.3,0,0), Vector3(0,0,0))
+                            print("FRENTE")
+                    else:
+                        # SE NÃO TIVER AMARELO ou base na tela, RODA ATE ACHAR UM
+                        print("PROCURANDO AMARELOO")
+                        vel = Twist(Vector3(-0.7,0,0), Vector3(0,0,-1))
+                        #TEMPO DO ROBO RODAR QUANDO TIVER PEGO O CREEPER
+                        rospy.sleep(0.5)
+                        vel = Twist(Vector3(0.5,0,0), Vector3(0,0,0))
+                        rospy.sleep(0,5)
 
             velocidade_saida.publish(vel)
             rospy.sleep(0.1)

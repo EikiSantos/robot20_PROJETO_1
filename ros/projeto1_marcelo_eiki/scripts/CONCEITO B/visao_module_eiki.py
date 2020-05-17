@@ -61,7 +61,7 @@ def identifica_cor(frame, color):
     elif color=="green" or color=="verde":
         color_1 = np.array([47, 100, 210])
         color_2 = np.array([70, 255, 255])
-    elif color=="purple" or color=="roxo":
+    elif color=="pink" or color=="rosa":
         color_1 = np.array([141,  50,  50])
         color_2 = np.array([151, 255, 255])
     
@@ -143,7 +143,7 @@ def identifica_cor_amarelo(frame, color):
     elif color=="green" or color=="verde":
         color_1 = np.array([47, 100, 210])
         color_2 = np.array([70, 255, 255])
-    elif color=="purple" or color=="roxo":
+    elif color=="pink" or color=="roxo":
         color_1 = np.array([141,  50,  50])
         color_2 = np.array([151, 255, 255])
     
