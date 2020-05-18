@@ -35,7 +35,28 @@ from sensor_msgs.msg import LaserScan
 
 import visao_module_marcelo
 
+confirm = False
+while confirm:
+    color = input("Cor (blue, green, pink):")
+    station = input("Estacao (dog, cat, bicycle e bird): ")
+    ID = input("ID: ")
 
+
+    goal = [color, ID, station]
+
+    dic = {}
+    dic["Color"] = color
+    dic["Station"] = station
+    dic["ID"] = ID
+    print("--------------------------------------------------")
+    for k,v in dic.items():
+        print(k, " : ", v)
+    print("--------------------------------------------------")
+    resp = input("Confirmar (y/n): ")
+    if resp == "y":
+        confirm = True
+    else:
+        confirm = False
 
 
 
@@ -285,7 +306,7 @@ if __name__=="__main__":
             else:
                 for r in resultados:
                     # Encontrou a base, irá em sua direção
-                    if "bird" in r[0]:
+                    if station in r[0]:
                         print ("ACHOU A BASEEE")
                         x_objeto = (r[2][0] + r[3][0])/2
                         tolerancia = 100
