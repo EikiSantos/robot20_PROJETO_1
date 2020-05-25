@@ -317,7 +317,7 @@ if __name__=="__main__":
                             x_objeto = (r[2][0] + r[3][0])/2
                             tolerancia = 25
                             # método de aproximação, se ficar mt próximo a camera não detecta a figura
-                            if minimo > 0.7:
+                            if minimo > 1:
                                 if (x_objeto < centro[0] - tolerancia):
                                     # Vira à esquerda
                                     vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/8.0))
@@ -336,9 +336,6 @@ if __name__=="__main__":
                                 velocidade_saida.publish(vel)
                                 rospy.sleep(0.1)
                                 raw_input()
-                        else:
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-1))
-                            velocidade_saida.publish(vel)
                     
                     elif len(media_amarelo) != 0 and len(centro) != 0:
                         print ("PEGOU CREEPER. PROCURANDO A BASE")
@@ -354,7 +351,7 @@ if __name__=="__main__":
                             print("DIREITA")
                         elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
                             # Segue em frente
-                            vel = Twist(Vector3(0.25,0,0), Vector3(0,0,-math.pi/18))
+                            vel = Twist(Vector3(0.3,0,0), Vector3(0,0,0))
                             print("FRENTE")
                     else:
                         # SE NÃO TIVER AMARELO ou base na tela, RODA ATE ACHAR UM
