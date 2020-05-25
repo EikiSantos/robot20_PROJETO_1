@@ -43,7 +43,7 @@ def processa(frame):
 
 
 
-def identifica_cor(frame):
+def identifica_cor(frame,color):
     '''
     Segmenta o maior objeto cuja cor é parecida com cor_h (HUE da cor, no espaço HSV).
     '''
@@ -55,9 +55,20 @@ def identifica_cor(frame):
     # frame = cv2.flip(frame, -1) # flip 0: eixo x, 1: eixo y, -1: 2 eixos
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    azul_1 = np.array([90, 100, 210])
-    azul_2 = np.array([130, 255, 255])
-    segmentado_cor = cv2.inRange(frame_hsv, azul_1, azul_2)
+    if color=="blue" or color=="azul":
+        color_1 = np.array([90, 100, 210])
+        color_2 = np.array([ 130, 255, 255])
+    elif color=="green" or color=="verde":
+        color_1 = np.array([47, 100, 210])
+        color_2 = np.array([70, 255, 255])
+    elif color=="pink" or color=="rosa":
+        color_1 = np.array([141,  50,  50])
+        color_2 = np.array([151, 255, 255])
+    segmentado_cor = cv2.inRange(frame_hsv, color_1, color_2)
+
+    amarelo_1 = np.array([22, 210, 210], dtype=np.uint8)
+    amarelo_2 = np.array([40, 255, 255], dtype=np.uint8)
+    duas_cores =segmentado_cor + cv2.inRange(frame_hsv, amarelo_1, amarelo_2)
 
     
     # Note que a notacão do numpy encara as imagens como matriz, portanto o enderecamento é
@@ -109,6 +120,9 @@ def identifica_cor(frame):
    # cv2.imshow('video', frame)
     #cv2.imshow('seg', segmentado_cor)
     #cv2.waitKey(1)
+    # cv2.imshow('video', frame)
+    cv2.imshow('seg', duas_cores)
+    cv2.waitKey(1)
 
     return media, maior_contorno_area
 
@@ -125,13 +139,11 @@ def identifica_cor_amarelo(frame):
     # frame = cv2.flip(frame, -1) # flip 0: eixo x, 1: eixo y, -1: 2 eixos
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    branco_1 = np.array([22, 210, 210], dtype=np.uint8)
-    branco_2 = np.array([40, 255, 255], dtype=np.uint8)
-    segmentado_cor = cv2.inRange(frame_hsv, branco_1, branco_2)
+    amarelo_1 = np.array([22, 210, 210], dtype=np.uint8)
+    amarelo_2 = np.array([40, 255, 255], dtype=np.uint8)
+    segmentado_cor = cv2.inRange(frame_hsv, amarelo_1, amarelo_2)
 
-    azul_1 = np.array([90, 100, 230])
-    azul_2 = np.array([130, 255, 255])
-    duas_cores =segmentado_cor + cv2.inRange(frame_hsv, azul_1, azul_2)
+    
 
 
     # Note que a notacão do numpy encara as imagens como matriz, portanto o enderecamento é
@@ -180,9 +192,7 @@ def identifica_cor_amarelo(frame):
     cv2.putText(frame,"{:d} {:d}".format(*media),(20,100), 1, 4,(255,255,255),2,cv2.LINE_AA)
     cv2.putText(frame,"{:0.1f}".format(maior_contorno_area),(20,50), 1, 4,(255,255,255),2,cv2.LINE_AA)
 
-   # cv2.imshow('video', frame)
-    cv2.imshow('seg', duas_cores)
-    cv2.waitKey(1)
+   
 
     return media, maior_contorno_area
 

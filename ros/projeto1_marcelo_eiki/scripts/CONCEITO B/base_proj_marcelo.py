@@ -36,9 +36,9 @@ from sensor_msgs.msg import LaserScan
 import visao_module_marcelo
 
 confirm = False
-while confirm:
-    color = input("Cor (blue, green, pink):")
-    station = input("Estacao (dog, cat, bicycle e bird): ")
+while confirm != True:
+    color = raw_input("Cor (blue, green, pink):")
+    station = raw_input("Estacao (dog, cat, bicycle e bird): ")
     ID = input("ID: ")
 
 
@@ -52,7 +52,7 @@ while confirm:
     for k,v in dic.items():
         print(k, " : ", v)
     print("--------------------------------------------------")
-    resp = input("Confirmar (y/n): ")
+    resp = raw_input("Confirmar (y/n): ")
     if resp == "y":
         confirm = True
     else:
@@ -184,7 +184,7 @@ def roda_todo_frame(imagem):
         # chamada resultados
         centro, imagem, resultados =  visao_module_marcelo.processa(cv_image)
         #COR VERDE
-        media_verde, maior_area_verde =  visao_module_marcelo.identifica_cor(cv_image)
+        media_verde, maior_area_verde =  visao_module_marcelo.identifica_cor(cv_image,color)
         #COR AMARELO
         media_amarelo, maior_area_amarelo =  visao_module_marcelo.identifica_cor_amarelo(cv_image)
 
@@ -222,7 +222,6 @@ if __name__=="__main__":
 
 
     tolerancia = 25
-    procura_animal = False
     pegou_verde = False
     # Exemplo de categoria de resultados
     # [('chair', 86.965459585189819, (90, 141), (177, 265))]
@@ -248,11 +247,11 @@ if __name__=="__main__":
                     tolerancia = 50
                     if (media_amarelo[0] < centro[0] - tolerancia):
                         # Vira à esquerda
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/12.0))
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/15.0))
                         #print("ESQUERDA")
                     elif (media_amarelo[0] > centro[0] + tolerancia):
                         # Vira à direita
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/12.0))                    
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/15.0))                    
                         #print("DIREITA")
                     elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
                         # Segue em frente
@@ -267,7 +266,7 @@ if __name__=="__main__":
                     print ("Scann")
                     print ("MENOR TERMOOOOOOO: ",minimo)
                     # saber aproximação do robo
-                    if minimo>0.22:
+                    if minimo>0.20:
                         x_objeto = media_verde[0]
                         if (x_objeto < centro[0] - tolerancia):
                             # Vira à esquerda
@@ -293,7 +292,7 @@ if __name__=="__main__":
                         # voltará a para a pista.
                         # o código abaixo é necessário para o robo ficar próximo o suficiente da pista 
                         # e decidir a direção que irá seguir
-                        vel = Twist(Vector3(-0.4,0,0),Vector3(0,0,-1.3))
+                        vel = Twist(Vector3(-0.4,0,0),Vector3(0,0,-2))
                         velocidade_saida.publish(vel)
                         rospy.sleep(1.5)
                         vel = Twist(Vector3(0.5,0,0),Vector3(0,0,0))
@@ -330,23 +329,21 @@ if __name__=="__main__":
                             velocidade_saida.publish(vel)
                             rospy.sleep(0.1)
                             raw_input()
-                            
-
                     elif len(media_amarelo) != 0 and len(centro) != 0:
                         print ("PEGOU CREEPER. PROCURANDO A BASE")
                         vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                        tolerancia = 100
+                        tolerancia = 40
                         if (media_amarelo[0] < centro[0] - tolerancia):
                             # Vira à esquerda
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/15))
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/10))
                             print("ESQUERDA")
                         elif (media_amarelo[0] > centro[0] + tolerancia):
                             # Vira à direita
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/15))                    
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/10))                    
                             print("DIREITA")
                         elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
                             # Segue em frente
-                            vel = Twist(Vector3(0.3,0,0), Vector3(0,0,0))
+                            vel = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
                             print("FRENTE")
                     else:
                         # SE NÃO TIVER AMARELO ou base na tela, RODA ATE ACHAR UM
