@@ -223,6 +223,7 @@ if __name__=="__main__":
 
     tolerancia = 25
     pegou_verde = False
+    achou_base = False
     # Exemplo de categoria de resultados
     # [('chair', 86.965459585189819, (90, 141), (177, 265))]
 
@@ -292,10 +293,10 @@ if __name__=="__main__":
                         # voltará a para a pista.
                         # o código abaixo é necessário para o robo ficar próximo o suficiente da pista 
                         # e decidir a direção que irá seguir
-                        vel = Twist(Vector3(-0.4,0,0),Vector3(0,0,-2))
+                        vel = Twist(Vector3(-0.4,0,0),Vector3(0,0,-1))
                         velocidade_saida.publish(vel)
                         rospy.sleep(1.5)
-                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,0))
+                        vel = Twist(Vector3(0.5,0,0),Vector3(0,0,0.1))
                         velocidade_saida.publish(vel)
                         rospy.sleep(1.5)
                         
@@ -306,53 +307,60 @@ if __name__=="__main__":
                 for r in resultados:
                     # Encontrou a base, irá em sua direção
                     if station in r[0]:
+                        achou_base = True
+                    if achou_base == True:
                         print ("ACHOU A BASEEE")
-                        x_objeto = (r[2][0] + r[3][0])/2
-                        tolerancia = 100
-                        # método de aproximação, se ficar mt próximo a camera não detecta a figura
-                        if minimo > 0.7:
-                            if x_objeto < (centro[0] - tolerancia):
-                                # Vira à esquerda
-                                vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/8.0))
-                                print("ESQUERDA")
-                            elif x_objeto > (centro[0] + tolerancia):
-                                # Vira à direita
-                                vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/8.0))                    
-                                print("DIREITA")
-                            elif (centro[0]- tolerancia) < x_objeto < (centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
-                                # Segue em frente
-                                vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
-                                print("FRENTE")
+                        print ("Scann")
+                        print ("MENOR TERMOOOOOOO: ",minimo)
+                        if station in r[0]:
+
+                            x_objeto = (r[2][0] + r[3][0])/2
+                            tolerancia = 25
+                            # método de aproximação, se ficar mt próximo a camera não detecta a figura
+                            if minimo > 0.7:
+                                if (x_objeto < centro[0] - tolerancia):
+                                    # Vira à esquerda
+                                    vel = Twist(Vector3(0,0,0), Vector3(0,0,math.pi/8.0))
+                                    print("ESQUERDA")
+                                elif (x_objeto > centro[0] + tolerancia):
+                                    # Vira à direita
+                                    vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/8.0))                    
+                                    print("DIREITA")
+                                elif (centro[0]- tolerancia) < x_objeto < (centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
+                                    # Segue em frente
+                                    vel = Twist(Vector3(0.4,0,0), Vector3(0,0,0))
+                                    print("FRENTE")
+                            else:
+                                # nesse momento, devemos abrir a garra, pode ser feito pelo código mesmo no futuro
+                                vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                                velocidade_saida.publish(vel)
+                                rospy.sleep(0.1)
+                                raw_input()
                         else:
-                            # nesse momento, devemos abrir a garra, pode ser feito pelo código mesmo no futuro
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-1))
                             velocidade_saida.publish(vel)
-                            rospy.sleep(0.1)
-                            raw_input()
+                    
                     elif len(media_amarelo) != 0 and len(centro) != 0:
                         print ("PEGOU CREEPER. PROCURANDO A BASE")
                         vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-                        tolerancia = 40
+                        tolerancia = 50
                         if (media_amarelo[0] < centro[0] - tolerancia):
                             # Vira à esquerda
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/10))
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,+math.pi/11))
                             print("ESQUERDA")
                         elif (media_amarelo[0] > centro[0] + tolerancia):
                             # Vira à direita
-                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/10))                    
+                            vel = Twist(Vector3(0,0,0), Vector3(0,0,-math.pi/11))                    
                             print("DIREITA")
                         elif (centro[0]- tolerancia < media_amarelo[0] < centro[0] + tolerancia): # Gosto de usar a < b < c do Python. Não seria necessário neste caso
                             # Segue em frente
-                            vel = Twist(Vector3(0.2,0,0), Vector3(0,0,0))
+                            vel = Twist(Vector3(0.25,0,0), Vector3(0,0,-math.pi/18))
                             print("FRENTE")
                     else:
                         # SE NÃO TIVER AMARELO ou base na tela, RODA ATE ACHAR UM
                         print("PROCURANDO AMARELOO")
-                        vel = Twist(Vector3(-0.7,0,0), Vector3(0,0,-1))
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-1))
                         #TEMPO DO ROBO RODAR QUANDO TIVER PEGO O CREEPER
-                        rospy.sleep(0.5)
-                        vel = Twist(Vector3(0.5,0,0), Vector3(0,0,0))
-                        rospy.sleep(0,5)
 
             velocidade_saida.publish(vel)
             rospy.sleep(0.1)
